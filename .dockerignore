@@ -1,0 +1,11 @@
+node_modules
+Dockerfile
+.dockerignore
+.github
+dist
+docker-compose.yml
+LICENSE
+README.md
+.travis.yml
+.env
+.env.test
