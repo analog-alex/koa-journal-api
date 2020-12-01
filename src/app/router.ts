@@ -7,7 +7,6 @@ import { BlogPostController } from '../controllers/blogpost.controller';
 import { CommentsController } from '../controllers/comments.controller';
 import { NotificationsController } from '../controllers/notifications.controller';
 import { AuthenticationController } from '../controllers/auth.controller';
-import { logger } from './logger';
 
 /*
  * Import all controller defined routes in a single place

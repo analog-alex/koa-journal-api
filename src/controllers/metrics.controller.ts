@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import Router from 'koa-router';
 import { Middleware } from 'koa-compose';
+import { mongoose } from '../app/db';
 
 /* *
  * Method implementations
@@ -32,7 +33,10 @@ export class MetricsController {
 
   public async health(ctx: Koa.Context) {
 
-    ctx.body = { status: 'UP' };
+    ctx.body = { 
+      status: 'UP',
+      db: mongoose.connection.readyState 
+    };
   }
 
   public async info(ctx: Koa.Context) {

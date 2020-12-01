@@ -10,7 +10,7 @@ import { Mongoose } from 'mongoose';
 export default class {
 
   private jobs: CronJobs;
-  private db: Mongoose;
+  db: Mongoose;
 
   public async start(configPath: string, withDB: boolean): Promise<Server>  {
 

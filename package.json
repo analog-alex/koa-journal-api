@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register src/tests/unit-tests/**.ts",
-    "test-integration": "mocha -r ts-node/register src/tests/integration-tests/**.ts",
+    "test": "mocha -r ts-node/register src/tests/unit-tests/**.ts --timeout 5000",
+    "test-integration": "mocha -r ts-node/register src/tests/integration-tests/**.ts --timeout 30000",
     "lint": "tslint --project tsconfig.json --format stylish",
     "build": "tsc",
     "serve": "ts-node src/index.ts",

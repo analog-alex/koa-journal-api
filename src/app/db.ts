@@ -12,13 +12,15 @@ const connection = async (connectionUrl: string, username: string, password: str
     useUnifiedTopology: true,
     useCreateIndex: true,
     useFindAndModify: false,
-    socketTimeoutMS: 60000,
-    connectTimeoutMS: 60000 });
+    socketTimeoutMS: 30000,
+    connectTimeoutMS: 30000 });
 };
 
 mongoose.connection.on('error', err => logger.error(JSON.stringify(err)));
 mongoose.connection.once('open', _ => logger.info('Connection established to MongoDB instance'));
+
 const disconnect = () => mongoose.disconnect();
+
 const connect = async () => {
   const connectionUrl: string =
     `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
