@@ -24,7 +24,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm i
+        
+    - name: Install npm depedencies  
+      run: npm i
+      
     - name: Run Unit Tests
       run: npm test
       
@@ -34,7 +37,7 @@ jobs:
         mongodb-version: 4.2
         
     - name: Run Integration Tests
-      run: npm test-integration
+      run: npm run test-integration
       env:
         AUTH_DISABLED: yes
         VERSION: 0.0.1
