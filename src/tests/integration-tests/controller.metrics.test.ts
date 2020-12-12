@@ -2,27 +2,21 @@ import chai from 'chai';
 import chai_http from 'chai-http';
 import 'mocha';
 import HttpStatus from 'http-status-codes';
-import AppServer from '../../server';
-import { Server } from 'http';
-
-import CronJobs from '../../app/cron';
+import Server from '../../server';
 
 describe('Integration test against metrics controller', () => {
 
   /* ==== entities ==== */
   chai.use(chai_http);
-  const appServer = new AppServer();
-  let app: Server;
+  const app = new Server();
 
   /* ==== before and after ==== */
   before(async () => {
-    app = await appServer.start('.env.test', false);
+    await app.start('.env.test', false);
   });
 
   after(async () => {
-    const promise = appServer.stop();
-    app.close();
-    await promise;
+    await app.stop();
   });
 
   /*
@@ -31,7 +25,7 @@ describe('Integration test against metrics controller', () => {
 
   it('metrics controller returns available endpoints when pinged at base', (done) => {
 
-    chai.request(app)
+    chai.request(app.asServer())
         .get('/metrics')
         .end((__, res) => {
 
@@ -44,7 +38,7 @@ describe('Integration test against metrics controller', () => {
 
   it('info endpoint correctly responds with information', (done) => {
 
-    chai.request(app)
+    chai.request(app.asServer())
         .get('/metrics/info')
         .end((__, res) => {
 
@@ -58,7 +52,7 @@ describe('Integration test against metrics controller', () => {
 
   it('health endpoint correctly responds with UP', (done) => {
 
-    chai.request(app)
+    chai.request(app.asServer())
         .get('/metrics/health')
         .end((__, res) => {
 

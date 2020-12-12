@@ -2,26 +2,22 @@ import chai from 'chai';
 import chai_http from 'chai-http';
 import 'mocha';
 import HttpStatus from 'http-status-codes';
-import AppServer from '../../server';
-import { Server } from 'http';
+import Server from '../../server';
 
 describe('Integration test against nofifications controller', function () {
   this.timeout(5000);
 
   /* ==== entities ==== */
   chai.use(chai_http);
-  const appServer = new AppServer();
-  let app: Server;
+  const app = new Server();
 
   /* ==== before and after ==== */
   before(async () => {
-    app = await appServer.start('.env.test', false);
+    await app.start('.env.test', false);
   });
 
   after(async () => {
-    const promise = appServer.stop();
-    app.close();
-    await promise;
+    await app.stop();
   });
 
   /*
@@ -30,7 +26,7 @@ describe('Integration test against nofifications controller', function () {
 
   it.skip('sms endpoint correctly sends a text message to the designated number', (done) => {
 
-    chai.request(app)
+    chai.request(app.asServer())
         .post('/notifications/sms')
         .set('content-type', 'application/json')
         .send({ to: process.env.TEST_SMS_TO, message: 'This is an integration test' })
