@@ -33,9 +33,9 @@ export class MetricsController {
 
   public async health(ctx: Koa.Context) {
 
-    ctx.body = { 
+    ctx.body = {
       status: 'UP',
-      db: mongoose.connection.readyState 
+      db: mongoose.connection.readyState,
     };
   }
 

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha -r ts-node/register src/tests/unit-tests/**.ts --timeout 5000",
     "test-integration": "mocha -r ts-node/register src/tests/integration-tests/**.ts --timeout 30000",
-    "lint": "tslint --project tsconfig.json --format stylish",
+    "lint": "tslint --project tsconfig.json",
+    "format": "tslint --project tsconfig.json --fix",
     "build": "tsc",
     "serve": "ts-node src/index.ts",
     "start": "nodemon"
