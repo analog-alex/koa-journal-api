@@ -1,0 +1,32 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Docker Publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+        
+    - name: Build docker image
+      run: docker build --tag journal-api .
+
+    - name: Publish image
+      uses: raccoondev/push-docker-gcr
+      with:
+        gcr_host: eu.gcr.io
+        image_name: journal-api
+        image_tag: latest
+        env:
+          GCLOUD_SERVICE_KEY: ${{ secrets.GCLOUD_SERVICE_KEY }}
+          GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
+      
+
+      
