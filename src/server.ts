@@ -10,9 +10,13 @@ import { Mongoose } from 'mongoose';
 export default class {
 
   private jobs: CronJobs;
-  db: Mongoose;
+  private db: Mongoose;
+  private path: string;
+  private httpServer: Server;
 
   public async start(configPath: string, withDB: boolean): Promise<Server>  {
+
+    this.path = configPath;
 
     // pick up configuration (dotenv file)
     const configuration: DotenvConfigOutput = config({ path: configPath });
@@ -40,15 +44,26 @@ export default class {
     // INGITION
     // launch server
     const PORT: number = Number(process.env.PORT) || 3000;
-    const server = app.listen(PORT, () => {
+    this.httpServer = app.listen(PORT, () => {
       logger.info(`Server up, listening on port ${PORT}`);
     });
 
-    return server;
+    return this.httpServer;
   }
 
   public async stop() {
+    this.httpServer.close();
     this.jobs.stop();
-    this.db?.disconnect();
+    await this.db?.disconnect();
+  }
+
+  public async clearDB() {
+    if (this.path === '.env.test') {
+      this.db.connection.db.dropDatabase((_, res) => logger.debug(`DB dropped: ${res}`));
+    }
+  }
+
+  public asServer(): Server {
+    return this.httpServer;
   }
 }
