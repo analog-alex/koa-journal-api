@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v2
         
     - name: Build and publish image to registry
       uses: RaccoonDev/push-docker-gcr@v1
