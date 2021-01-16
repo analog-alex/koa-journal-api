@@ -23,7 +23,7 @@ const disconnect = () => mongoose.disconnect();
 
 const connect = async () => {
   const connectionUrl: string =
-    `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
+    `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?retryWrites=true&w=majority`;
   await connection(connectionUrl, process.env.DB_USERNAME, process.env.DB_PASSWORD);
 };
 
