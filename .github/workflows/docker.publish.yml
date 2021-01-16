@@ -13,11 +13,8 @@ jobs:
 
     steps:
         
-    - name: Build docker image
-      run: docker build --tag journal-api .
-
-    - name: Publish image
-      uses: raccoondev/push-docker-gcr
+    - name: Build and publish image to registry
+      uses: RaccoonDev/push-docker-gcr@v1
       with:
         gcr_host: eu.gcr.io
         image_name: journal-api
