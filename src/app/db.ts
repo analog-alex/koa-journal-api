@@ -22,8 +22,14 @@ mongoose.connection.once('open', _ => logger.info('Connection established to Mon
 const disconnect = () => mongoose.disconnect();
 
 const connect = async () => {
-  const connectionUrl: string =
+  let connectionUrl: string =
     `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+
+  // for mongo atlas connections the connection string is different
+  if (process.env.DB_ATLAS === 'on') {
+    connectionUrl = `mongodb+srv://${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+  }
+
   await connection(connectionUrl, process.env.DB_USERNAME, process.env.DB_PASSWORD);
 };
 
