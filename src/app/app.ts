@@ -8,7 +8,7 @@ import 'reflect-metadata';
 
 // init app
 const app: Koa = new Koa()
-    .use(ratelimit)
+    .use(ratelimit())
     .use(bodyparser())
     .use(cors({ origin: '*' }))
     .use(requestHandler)
