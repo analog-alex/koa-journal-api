@@ -3,6 +3,7 @@ import Router from 'koa-router';
 import HttpStatusCodes from 'http-status-codes';
 import { Middleware } from 'koa-compose';
 import BlogPost from '../models/post.model';
+import { Page, Pageable } from '../models/page.model';
 
 import { TextParse } from '../utils/text-parse';
 
@@ -36,11 +37,26 @@ export class BlogPostController {
   /* ==== the asynchronous methods ==== */
 
   /*
-   * GET => []
+   * GET (paged) => []
    */
   public async getAll(ctx: Koa.Context) {
 
-    ctx.body = await BlogPost.find().exec();
+    const page = new Page();
+    page.index = Number(ctx.query?.index ?? page.index);
+    page.size = Number(ctx.query?.size ?? page.size);
+
+    if (page.index < 0 || page.size < 0) {
+      ctx.throw(HttpStatusCodes.BAD_REQUEST, 'Page index and/or page size are not in valid range');
+    }
+
+    const [results, count] = await Promise.all([
+      BlogPost.find().skip(page.size * page.index).limit(page.size).exec(),
+      BlogPost.countDocuments().exec(),
+    ]);
+
+    page.setCount(count);
+
+    ctx.body = new Pageable(page, results);
   }
 
   /*
@@ -100,7 +116,7 @@ export class BlogPostController {
   }
 
   /*
-   * PATCH => delete {}
+   * DELETE => delete {}
    */
   public async delete(ctx: Koa.Context) {
 

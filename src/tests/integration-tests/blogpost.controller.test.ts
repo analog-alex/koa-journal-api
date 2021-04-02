@@ -45,7 +45,7 @@ describe('Integration test against blogpost controller', () => {
 
     chai.expect(response).to.have.status(HttpStatus.OK);
     chai.expect(response.body).to.be.not.null;
-    chai.expect(response.body).to.be.an('array');
+    chai.expect(response.body.embedded).to.be.an('array');
   });
 
   it('returns 404 when fetching a blogpost with a non-existent id', async () => {
@@ -79,17 +79,17 @@ describe('Integration test against blogpost controller', () => {
 
     it('lists that blogpost when fecthing blogposts', async () => {
 
-      const response = await  chai.request(app.asServer()).get(prefix);
+      const response = await chai.request(app.asServer()).get(prefix);
 
       chai.expect(response).to.have.status(HttpStatus.OK);
       chai.expect(response.body).to.be.not.null;
-      chai.expect(response.body).to.be.an('array');
-      chai.expect(response.body).to.be.an('array').with.length.gte(1);
+      chai.expect(response.body.embedded).to.be.an('array');
+      chai.expect(response.body.embedded).to.be.an('array').with.length(1);
     });
 
     it('fetches that particular blogpost when fetching with its id', async () => {
 
-      const response = await  chai.request(app.asServer()).get(`${prefix}/${created.id}`);
+      const response = await chai.request(app.asServer()).get(`${prefix}/${created.id}`);
 
       chai.expect(response).to.have.status(HttpStatus.OK);
       chai.expect(response.body).to.be.not.null;
@@ -99,7 +99,7 @@ describe('Integration test against blogpost controller', () => {
 
     it('deletes that blogpost using its id', async () => {
 
-      const response = await  chai.request(app.asServer()).delete(`${prefix}/${created.id}`);
+      const response = await chai.request(app.asServer()).delete(`${prefix}/${created.id}`);
 
       chai.expect(response).to.have.status(HttpStatus.NO_CONTENT);
     });
@@ -120,5 +120,48 @@ describe('Integration test against blogpost controller', () => {
       .delete(`${prefix}/41224d776a326fb40f000001`);
 
     chai.expect(response).to.have.status(HttpStatus.NOT_FOUND);
+  });
+
+  context('When multiple blogposts are created', () => {
+
+    it('creates them and returns 200 in each request', async () => {
+      const responses = await Promise.all([
+        chai.request(app.asServer())
+          .post(prefix).set('Content-type', 'application/json').send(blogpost),
+
+        chai.request(app.asServer())
+          .post(prefix).set('Content-type', 'application/json').send(blogpost),
+
+        chai.request(app.asServer())
+          .post(prefix).set('Content-type', 'application/json').send(blogpost),
+      ]);
+
+      chai.expect(responses).to.be.an('array').with.length(3);
+      responses.forEach(response => chai.expect(response).to.have.status(HttpStatus.CREATED));
+    });
+
+    context('After multiple blogposts are created', () => {
+      it('can request the paginated results for blogposts (default values)', async () => {
+        const response = await chai.request(app.asServer()).get(prefix);
+
+        chai.expect(response).to.have.status(HttpStatus.OK);
+        chai.expect(response.body.page.index).to.equal(0);
+        chai.expect(response.body.page.size).to.equal(5);
+        chai.expect(response.body.page.totalElements).to.equal(3);
+        chai.expect(response.body.page.totalPages).to.equal(1);
+        chai.expect(response.body.embedded).to.be.an('array').with.length(3);
+      });
+
+      it('can request the paginated results for blogposts (given values in params)', async () => {
+        const response = await chai.request(app.asServer()).get(`${prefix}?index=0&size=2`);
+
+        chai.expect(response).to.have.status(HttpStatus.OK);
+        chai.expect(response.body.page.index).to.equal(0);
+        chai.expect(response.body.page.size).to.equal(2);
+        chai.expect(response.body.page.totalElements).to.equal(3);
+        chai.expect(response.body.page.totalPages).to.equal(2);
+        chai.expect(response.body.embedded).to.be.an('array').with.length(2);
+      });
+    });
   });
 });

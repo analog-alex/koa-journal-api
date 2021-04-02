@@ -26,7 +26,7 @@ describe('Integration test against comments controller', () => {
   });
 
   after(async () => {
-    app.clearDB();
+    await app.clearDB();
     await app.stop();
   });
 
@@ -54,6 +54,5 @@ describe('Integration test against comments controller', () => {
       chai.expect(response.body).to.be.not.null;
       chai.expect(response.body).to.be.an('array').with.length.gt(0);
     });
-
   });
 });
