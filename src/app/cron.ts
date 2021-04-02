@@ -1,17 +1,11 @@
 import cron from 'node-cron';
-import { logger } from './logger';
 
 export default class CronJobs {
 
   private jobs: cron.ScheduledTask[] = [];
 
   public start() {
-    this.jobs.push(
-      cron.schedule('*/2 * * * *', () => {
-        logger.info('running a task every 2 minutes');
-      }),
-    );
-
+    // no jobs are yet needed
     this.jobs.forEach(job => job.start());
   }
 
