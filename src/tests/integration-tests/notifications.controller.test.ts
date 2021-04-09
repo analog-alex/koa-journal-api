@@ -24,16 +24,12 @@ describe('Integration test against nofifications controller', function () {
    * the tests proper
    */
 
-  it.skip('sms endpoint correctly sends a text message to the designated number', (done) => {
+  it.skip('sms endpoint correctly sends a text message to the designated number', async () => {
+    const response = await chai.request(app.asServer())
+      .post('/notifications/sms')
+      .set('content-type', 'application/json')
+      .send({ to: process.env.TEST_SMS_TO, message: 'This is an integration test' });
 
-    chai.request(app.asServer())
-        .post('/notifications/sms')
-        .set('content-type', 'application/json')
-        .send({ to: process.env.TEST_SMS_TO, message: 'This is an integration test' })
-        .end((__, res) => {
-
-          chai.expect(res).to.have.status(HttpStatus.NO_CONTENT);
-          done();
-        });
+    chai.expect(response).to.have.status(HttpStatus.NO_CONTENT);
   });
 });
