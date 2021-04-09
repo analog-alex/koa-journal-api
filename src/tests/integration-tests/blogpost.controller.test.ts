@@ -22,6 +22,13 @@ describe('Integration test against blogpost controller', () => {
       'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
     tags: ['test', 'integration'],
   };
+  const blogpostAlt = {
+    author: 'Author',
+    title: 'Word',
+    text: 'Quantum mechanics is a fundamental theory in physics that provides a description of the physical properties' +
+      'of nature at the scale of atoms and subatomic particles.',
+    tags: ['science'],
+  };
 
   /* ==== absorved ==== */
   const created = { id: '' };
@@ -133,7 +140,7 @@ describe('Integration test against blogpost controller', () => {
           .post(prefix).set('Content-type', 'application/json').send(blogpost),
 
         chai.request(app.asServer())
-          .post(prefix).set('Content-type', 'application/json').send(blogpost),
+          .post(prefix).set('Content-type', 'application/json').send(blogpostAlt),
       ]);
 
       chai.expect(responses).to.be.an('array').with.length(3);
@@ -161,6 +168,48 @@ describe('Integration test against blogpost controller', () => {
         chai.expect(response.body.page.totalElements).to.equal(3);
         chai.expect(response.body.page.totalPages).to.equal(2);
         chai.expect(response.body.embedded).to.be.an('array').with.length(2);
+      });
+
+      it('can query posts by title', async () => {
+        const response = await chai.request(app.asServer()).get(`${prefix}?title=Title`);
+
+        chai.expect(response).to.have.status(HttpStatus.OK);
+        chai.expect(response.body.page.totalElements).to.equal(2);
+        chai.expect(response.body.embedded).to.be.an('array').with.length(2);
+      });
+
+      it('can query posts by tag', async () => {
+        const response = await chai.request(app.asServer()).get(`${prefix}?tags=science`);
+
+        chai.expect(response).to.have.status(HttpStatus.OK);
+        chai.expect(response.body.page.totalElements).to.equal(1);
+        chai.expect(response.body.embedded).to.be.an('array').with.length(1);
+      });
+
+      it('can query posts by text content', async () => {
+        const response = await chai.request(app.asServer()).get(`${prefix}?text=Quantum`);
+
+        chai.expect(response).to.have.status(HttpStatus.OK);
+        chai.expect(response.body.page.totalElements).to.equal(1);
+        chai.expect(response.body.embedded).to.be.an('array').with.length(1);
+      });
+
+      it('can query posts by multiple fields (expect zero results)', async () => {
+        const response = await chai.request(app.asServer())
+          .get(`${prefix}?title=Title&tags=science`);
+
+        chai.expect(response).to.have.status(HttpStatus.OK);
+        chai.expect(response.body.page.totalElements).to.equal(0);
+        chai.expect(response.body.embedded).to.be.an('array').with.length(0);
+      });
+
+      it('can query posts by multiple fields (expect one result)', async () => {
+        const response = await chai.request(app.asServer())
+          .get(`${prefix}?title=Word&tags=science`);
+
+        chai.expect(response).to.have.status(HttpStatus.OK);
+        chai.expect(response.body.page.totalElements).to.equal(1);
+        chai.expect(response.body.embedded).to.be.an('array').with.length(1);
       });
     });
   });
