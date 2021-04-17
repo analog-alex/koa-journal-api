@@ -28,3 +28,26 @@ const blogPostSchema: Schema = new Schema({
 });
 
 export default mongoose.model<IBlogPost>('BlogPost', blogPostSchema);
+
+/* *
+ * helper class to build the query object
+ */
+export class Search {
+  constructor(public ops: any) {}
+
+  asMongoSearch(): object {
+    const searchParams: any = {};
+
+    if (this.ops['title'] !== undefined) {
+      searchParams.title = this.ops['title'];
+    }
+    if (this.ops['tags'] !== undefined) {
+      searchParams.tags = this.ops['tags'];
+    }
+    if (this.ops['text'] !== undefined) {
+      searchParams.text = { $regex: this.ops['text'], $options: 'i' };
+    }
+
+    return searchParams;
+  }
+}

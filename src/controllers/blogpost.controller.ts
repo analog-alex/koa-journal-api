@@ -2,7 +2,7 @@ import Koa from 'koa';
 import Router from 'koa-router';
 import HttpStatusCodes from 'http-status-codes';
 import { Middleware } from 'koa-compose';
-import BlogPost from '../models/post.model';
+import BlogPost, { Search } from '../models/post.model';
 import { Page, Pageable } from '../models/page.model';
 
 import { TextParse } from '../utils/text-parse';
@@ -41,6 +41,7 @@ export class BlogPostController {
    */
   public async getAll(ctx: Koa.Context) {
 
+    // get pagination parameters, if any exist
     const page = new Page();
     page.index = Number(ctx.query?.index ?? page.index);
     page.size = Number(ctx.query?.size ?? page.size);
@@ -49,9 +50,12 @@ export class BlogPostController {
       ctx.throw(HttpStatusCodes.BAD_REQUEST, 'Page index and/or page size are not in valid range');
     }
 
+    // sanitize query params
+    const search = new Search(ctx.request.query).asMongoSearch();
+
     const [results, count] = await Promise.all([
-      BlogPost.find().skip(page.size * page.index).limit(page.size).exec(),
-      BlogPost.countDocuments().exec(),
+      BlogPost.find(search).skip(page.size * page.index).limit(page.size).exec(),
+      BlogPost.countDocuments(search).exec(),
     ]);
 
     page.setCount(count);
